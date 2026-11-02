@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>GeoTap – Geography Practice</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: #0b1220;
+      color: #e8eefc;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      overscroll-behavior: none;
+      overflow: hidden
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer
+    }
+
+    input {
+      -webkit-user-select: text;
+      user-select: text;
+      font: inherit
+    }
+
+    .hidden {
+      display: none !important
+    }
+
+    .screen {
+      position: fixed;
+      inset: 0
+    }
+
+    /* ---------- MENU ---------- */
+    #menu,
+    #info {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 28px)
+    }
+
+    #menu h1 {
+      margin: 4px 0 2px;
+      font-size: 30px;
+      letter-spacing: -.5px
+    }
+
+    #menu .tag {
+      margin: 0 0 18px;
+      color: #8fa0c4;
+      font-size: 15px
+    }
+
+    #menu h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6f82ab;
+      margin: 22px 0 10px
+    }
+
+    .opt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0;
+      background: #121b2f;
+      border-radius: 14px;
+      padding: 10px 12px
+    }
+
+    .opt label {
+      font-size: 14px;
+      color: #b6c4e4
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px
+    }
+
+    .chips button {
+      border: 0;
+      background: #1d2a45;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #9db0d8
+    }
+
+    .chips button.on {
+      background: #4cc9f0;
+      color: #06202b
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: #7f92ba;
+      margin: 0 4px 6px;
+      line-height: 1.35
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .card {
+      position: relative;
+      text-align: left;
+      background: linear-gradient(160deg, #18233b, #121b2f);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-height: 112px;
+      border: 1px solid #1f2d4a;
+      cursor: pointer
+    }
+
+    .card:active {
+      transform: scale(.97);
+      background: #1d2a45
+    }
+
+    .card .ic {
+      font-size: 26px
+    }
+
+    .card .tt {
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.15;
+      padding-right: 14px
+    }
+
+    .card .ds {
+      font-size: 12px;
+      color: #7f92ba
+    }
+
+    .card .bs {
+      font-size: 12px;
+      color: #3ddc97;
+      margin-top: auto;
+      padding-top: 4px;
+      min-height: 19px
+    }
+
+    .card .bs.new {
+      color: #58698f
+    }
+
+    .card .pb {
+      height: 4px;
+      background: #0c1426;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 2px
+    }
+
+    .card .pb i {
+      display: block;
+      height: 100%;
+      background: #3ddc97
+    }
+
+    .card .info {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 0;
+      background: #22314f;
+      color: #9db0d8;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0
+    }
+
+    .card .info:active {
+      background: #4cc9f0;
+      color: #06202b
+    }
+
+    /* ---------- GAME ---------- */
+    #game {
+      display: flex;
+      flex-direction: column
+    }
+
+    #topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: calc(env(safe-area-inset-top) + 8px) 12px 8px
+    }
+
+    #quit {
+      border: 0;
+      background: #1d2a45;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      font-size: 16px
+    }
+
+    #prog {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums
+    }
+
+    .sp {
+      flex: 1
+    }
+
+    #timer {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: #4cc9f0;
+      min-width: 48px;
+      text-align: right
+    }
+
+    #miss {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: #ff7d90;
+      min-width: 40px;
+      text-align: right
+    }
+
+    #bar {
+      height: 3px;
+      background: #17223a
+    }
+
+    #bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: #4cc9f0;
+      transition: width .3s
+    }
+
+    #prompt {
+      padding: 8px 16px 4px;
+      text-align: center;
+      min-height: 76px
+    }
+
+    #q {
+      font-size: 21px;
+      line-height: 1.25
+    }
+
+    #q b {
+      color: #4cc9f0
+    }
+
+    #fb {
+      min-height: 22px;
+      font-size: 14.5px;
+      font-weight: 600;
+      margin-top: 4px;
+      line-height: 1.3
+    }
+
+    #fb.good {
+      color: #3ddc97
+    }
+
+    #fb.bad {
+      color: #ff7d90
+    }
+
+    #fb.info {
+      color: #ffd166
+    }
+
+    #mapwrap {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      background: #0a1020
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none
+    }
+
+    #zoomhint {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      background: #000a;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #cfe;
+      pointer-events: none;
+      transition: opacity .6s;
+      white-space: nowrap
+    }
+
+    #answer {
+      padding: 8px 12px 0
+    }
+
+    .a-easy {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .a-btn {
+      border: 1px solid #2a3b60;
+      background: #18233b;
+      border-radius: 12px;
+      padding: 12px 8px;
+      font-weight: 700;
+      font-size: 15.5px;
+      min-height: 50px;
+      line-height: 1.15
+    }
+
+    .a-btn:active {
+      filter: brightness(1.3)
+    }
+
+    .a-btn:disabled {
+      color: #e8eefc;
+      pointer-events: none
+    }
+
+    .a-btn:disabled:not(.right):not(.wrong) {
+      opacity: .45
+    }
+
+    .a-btn.wrong {
+      background: #e0566b33;
+      border-color: #e0566b;
+      color: #ff9aa9;
+      opacity: .65
+    }
+
+    .a-btn.right {
+      background: #2fbf8433;
+      border-color: #2fbf84;
+      color: #7dffc8;
+      opacity: 1
+    }
+
+    .a-med {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 30vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px
+    }
+
+    .a-med .a-btn {
+      min-height: 0;
+      padding: 8px 11px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px
+    }
+
+    .a-med .ltr {
+      flex-basis: 100%;
+      font-size: 11px;
+      font-weight: 800;
+      color: #6f82ab;
+      letter-spacing: 1px;
+      margin-top: 4px
+    }
+
+    .a-hard {
+      display: flex;
+      gap: 8px
+    }
+
+    #ans {
+      flex: 1;
+      min-width: 0;
+      background: #121b2f;
+      border: 2px solid #2a3b60;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 18px;
+      padding: 11px 14px;
+      outline: none
+    }
+
+    #ans:focus {
+      border-color: #4cc9f0
+    }
+
+    #ans.shake {
+      animation: shake .35s
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-7px)
+      }
+
+      40% {
+        transform: translateX(7px)
+      }
+
+      60% {
+        transform: translateX(-5px)
+      }
+
+      80% {
+        transform: translateX(5px)
+      }
+    }
+
+    #bottom {
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px calc(env(safe-area-inset-bottom) + 10px)
+    }
+
+    .btn {
+      border: 0;
+      background: #1d2a45;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 16px;
+      flex: 1
+    }
+
+    .btn.primary {
+      background: #4cc9f0;
+      color: #06202b
+    }
+
+    .btn.ghost {
+      flex: 0 0 auto
+    }
+
+    .btn.danger {
+      background: #3a1d28;
+      color: #ff9aa9
+    }
+
+    .btn:active {
+      filter: brightness(.85)
+    }
+
+    /* map styling */
+    .shape {
+      fill: #34456a;
+      stroke: #0a1020;
+      stroke-width: .7;
+      vector-effect: non-scaling-stroke
+    }
+
+    .shape.ctx {
+      fill: #18223a
+    }
+
+    .shape.ok1 {
+      fill: #2fbf84
+    }
+
+    .shape.ok2 {
+      fill: #c4c04a
+    }
+
+    .shape.ok3 {
+      fill: #e89a3c
+    }
+
+    .shape.miss {
+      fill: #e0566b
+    }
+
+    .shape.flash {
+      animation: fl .55s
+    }
+
+    @keyframes fl {
+
+      0%,
+      70% {
+        fill: #ff3b5c
+      }
+    }
+
+    .shape.pulse,
+    .dot.pulse {
+      animation: pulse .7s infinite alternate
+    }
+
+    @keyframes pulse {
+      from {
+        fill: #ffd166
+      }
+
+      to {
+        fill: #ff8c1a
+      }
+    }
+
+    .dot {
+      fill: #f4f7ff;
+      stroke: #0a1020;
+      pointer-events: none
+    }
+
+    .dot.ok1 {
+      fill: #2fbf84
+    }
+
+    .dot.ok2 {
+      fill: #c4c04a
+    }
+
+    .dot.ok3 {
+      fill: #e89a3c
+    }
+
+    .dot.miss {
+      fill: #e0566b
+    }
+
+    .dot.flash {
+      animation: fld .55s
+    }
+
+    @keyframes fld {
+
+      0%,
+      70% {
+        fill: #ff3b5c
+      }
+    }
+
+    .ring {
+      fill: none;
+      stroke: #ffd166;
+      pointer-events: none;
+      animation: ringp .8s infinite alternate
+    }
+
+    @keyframes ringp {
+      from {
+        stroke-opacity: 1
+      }
+
+      to {
+        stroke-opacity: .2
+      }
+    }
+
+    .lbl {
+      fill: #fff;
+      paint-order: stroke;
+      stroke: #000;
+      stroke-opacity: .85;
+      font-weight: 800;
+      text-anchor: middle;
+      pointer-events: none
+    }
+
+    /* ---------- RESULTS ---------- */
+    #results {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      text-align: center;
+      padding: calc(env(safe-area-inset-top) + 22px) 16px calc(env(safe-area-inset-bottom) + 24px)
+    }
+
+    #rmode {
+      color: #8fa0c4;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    #grade {
+      font-size: 92px;
+      font-weight: 900;
+      line-height: 1.05;
+      margin: 6px 0 0
+    }
+
+    #pct {
+      font-size: 22px;
+      font-weight: 700
+    }
+
+    #delta {
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 2px;
+      color: #8fa0c4
+    }
+
+    #delta.up {
+      color: #3ddc97
+    }
+
+    #delta.down {
+      color: #ff9aa9
+    }
+
+    #msg {
+      color: #9db0d8;
+      margin: 4px 0 12px
+    }
+
+    #best {
+      display: inline-block;
+      background: #ffd166;
+      color: #3a2b00;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 10px
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0 18px
+    }
+
+    .stat {
+      background: #121b2f;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center
+    }
+
+    .stat b {
+      display: block;
+      font-size: 24px;
+      font-variant-numeric: tabular-nums
+    }
+
+    .stat span {
+      font-size: 12px;
+      color: #7f92ba;
+      text-transform: uppercase;
+      letter-spacing: .8px
+    }
+
+    #review {
+      text-align: left;
+      margin-bottom: 16px
+    }
+
+    #review h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6f82ab;
+      margin: 0 0 8px
+    }
+
+    .rv {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .rv span {
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #e0566b33;
+      color: #ff9aa9;
+      border: 1px solid #e0566b66
+    }
+
+    .rv span.some {
+      background: #e89a3c26;
+      color: #ffc27a;
+      border-color: #e89a3c66
+    }
+
+    .rbtns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    /* ---------- INFO / STATS ---------- */
+    #infoHead {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px
+    }
+
+    #infoBack {
+      border: 0;
+      background: #1d2a45;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      font-size: 20px;
+      flex: none
+    }
+
+    #infoTitle {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.15
+    }
+
+    #infoTabs {
+      margin-bottom: 6px
+    }
+
+    #infoTabs button {
+      flex: 1
+    }
+
+    #info .stats {
+      margin: 10px 0
+    }
+
+    .sec {
+      background: #121b2f;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 12px 0
+    }
+
+    .sec h3 {
+      margin: 0 0 8px;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: #6f82ab
+    }
+
+    .rows .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 0;
+      border-top: 1px solid #1b2842;
+      font-size: 14px
+    }
+
+    .rows .row:first-child {
+      border-top: 0
+    }
+
+    .row .rt {
+      color: #8fa0c4;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      text-align: right
+    }
+
+    .rt.bad {
+      color: #ff9aa9
+    }
+
+    .rt.good {
+      color: #7dffc8
+    }
+
+    .rt.dim {
+      color: #4f5f82
+    }
+
+    .mbar {
+      display: flex;
+      height: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0c1426
+    }
+
+    .mbar i {
+      display: block;
+      height: 100%
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      font-size: 12.5px;
+      color: #9db0d8;
+      margin-top: 8px
+    }
+
+    .n2 {
+      font-size: 12px;
+      color: #5f7099;
+      margin-top: 6px
+    }
+
+    .empty {
+      color: #6f82ab;
+      font-size: 13.5px;
+      line-height: 1.4
+    }
+
+    .spark {
+      width: 100%;
+      height: 70px;
+      display: block
+    }
+
+    .sparklbl {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #7f92ba;
+      margin-top: 2px
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      color: #9db0d8;
+      padding: 2px 0
+    }
+
+    details[open] summary {
+      margin-bottom: 8px
+    }
+
+    .acts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #0b1220ee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+      font-size: 17px
+    }
+
+    .spin {
+      width: 34px;
+      height: 34px;
+      border: 4px solid #1d2a45;
+      border-top-color: #4cc9f0;
+      border-radius: 50%;
+      animation: sp 1s linear infinite
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    #err {
+      color: #ff9aa9;
+      font-size: 14px;
+      max-width: 300px;
+      text-align: center
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- MENU -->
+  <div id="menu" class="screen">
+    <h1>🌎 GeoTap</h1>
+    <p class="tag">Learn the map by tapping it.</p>
+
+    <div class="opt"><label>Play style</label>
+      <div class="chips" id="optStyle"><button data-v="find">📍 Find it</button><button data-v="name">🔤 Name it</button></div>
+    </div>
+    <div class="opt" id="rowDiff"><label>Difficulty</label>
+      <div class="chips" id="optDiff"><button data-v="easy">Easy</button><button data-v="medium">Medium</button><button data-v="hard">Hard</button></div>
+    </div>
+    <div class="note" id="styleNote"></div>
+    <div class="opt"><label>Questions</label>
+      <div class="chips" id="optLen"><button data-v="10">10</button><button data-v="25">25</button><button data-v="all">All</button></div>
+    </div>
+    <div class="opt"><label>Show answer after</label>
+      <div class="chips" id="optHint"><button data-v="2">2</button><button data-v="3">3</button><button data-v="5">5</button></div>
+    </div>
+
+    <h2>United States</h2>
+    <div class="grid" id="gridUS"></div>
+    <h2>World</h2>
+    <div class="grid" id="gridWorld"></div>
+  </div>
+
+  <!-- GAME -->
+  <div id="game" class="screen hidden">
+    <div id="topbar">
+      <button id="quit" aria-label="Quit">✕</button>
+      <div id="prog">1/10</div>
+      <div class="sp"></div>
+      <div id="miss">✗ 0</div>
+      <div id="timer">0:00</div>
+    </div>
+    <div id="bar"><i></i></div>
+    <div id="prompt">
+      <div id="q"></div>
+      <div id="fb"></div>
+    </div>
+    <div id="mapwrap"><svg id="map"></svg>
+      <div id="zoomhint">Pinch to zoom · drag to pan</div>
+    </div>
+    <div id="answer" class="hidden"></div>
+    <div id="bottom">
+      <button class="btn ghost" id="resetZoom">⤢ Reset view</button>
+      <button class="btn" id="showBtn">👁 Show me</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="screen hidden">
+    <div id="rmode"></div>
+    <div id="grade">A</div>
+    <div id="pct">100%</div>
+    <div id="delta"></div>
+    <div id="msg"></div>
+    <div id="best" class="hidden">🏆 NEW PERSONAL BEST</div>
+    <div class="stats">
+      <div class="stat"><b id="sTime">0:00</b><span>Total time</span></div>
+      <div class="stat"><b id="sAvg">0s</b><span>Avg / question</span></div>
+      <div class="stat"><b id="sFirst">0/0</b><span>First-try correct</span></div>
+      <div class="stat"><b id="sWrong">0</b><span>Wrong answers</span></div>
+    </div>
+    <div id="review" class="hidden">
+      <h3>Review these</h3>
+      <div class="rv" id="rv"></div>
+    </div>
+    <div class="rbtns">
+      <button class="btn primary hidden" id="practice">🎯 Practice the ones I missed</button>
+      <button class="btn" id="again">↻ Play again</button>
+      <button class="btn" id="toMenu">Menu</button>
+    </div>
+  </div>
+
+  <!-- INFO / STATS -->
+  <div id="info" class="screen hidden">
+    <div id="infoHead"><button id="infoBack" aria-label="Back">‹</button>
+      <div id="infoTitle"></div>
+    </div>
+    <div class="chips" id="infoTabs"><button data-v="find">📍 Find it</button><button data-v="name">🔤 Name it</button></div>
+    <div id="infoBody"></div>
+  </div>
+
+  <div id="loading" class="hidden">
+    <div class="spin"></div>
+    <div id="loadTxt">Loading map…</div>
+    <div id="err"></div>
+    <button class="btn hidden" id="errBack" style="flex:none">Back</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script>
+    (function() {
+      const $ = s => document.querySelector(s);
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;'
+      } [c]));
+      const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+      const store = {
+        get(k, d) {
+          try {
+            const v = localStorage.getItem(k);
+            return v ? JSON.parse(v) : d
+          } catch (e) {
+            return d
+          }
+        },
+        set(k, v) {
+          try {
+            localStorage.setItem(k, JSON.stringify(v))
+          } catch (e) {}
+        },
+        del(k) {
+          try {
+            localStorage.removeItem(k)
+          } catch (e) {}
+        }
+      };
+
+      /* ================= DATA ================= */
+      // [state, capital, lat, lon]
+      const CAPS = [
+        ["Alabama", "Montgomery", 32.377, -86.300],
+        ["Alaska", "Juneau", 58.3019, -134.4197],
+        ["Arizona", "Phoenix", 33.4484, -112.074],
+        ["Arkansas", "Little Rock", 34.7465, -92.2896],
+        ["California", "Sacramento", 38.5816, -121.4944],
+        ["Colorado", "Denver", 39.7392, -104.9903],
+        ["Connecticut", "Hartford", 41.7658, -72.6734],
+        ["Delaware", "Dover", 39.1582, -75.5244],
+        ["Florida", "Tallahassee", 30.4383, -84.2807],
+        ["Georgia", "Atlanta", 33.749, -84.388],
+        ["Hawaii", "Honolulu", 21.3069, -157.8583],
+        ["Idaho", "Boise", 43.615, -116.2023],
+        ["Illinois", "Springfield", 39.7817, -89.6501],
+        ["Indiana", "Indianapolis", 39.7684, -86.1581],
+        ["Iowa", "Des Moines", 41.5868, -93.625],
+        ["Kansas", "Topeka", 39.0473, -95.6752],
+        ["Kentucky", "Frankfort", 38.2009, -84.8733],
+        ["Louisiana", "Baton Rouge", 30.4515, -91.1871],
+        ["Maine", "Augusta", 44.3106, -69.7795],
+        ["Maryland", "Annapolis", 38.9784, -76.4922],
+        ["Massachusetts", "Boston", 42.3601, -71.0589],
+        ["Michigan", "Lansing", 42.7325, -84.5555],
+        ["Minnesota", "Saint Paul", 44.9537, -93.09],
+        ["Mississippi", "Jackson", 32.2988, -90.1848],
+        ["Missouri", "Jefferson City", 38.5767, -92.1735],
+        ["Montana", "Helena", 46.5891, -112.0391],
+        ["Nebraska", "Lincoln", 40.8136, -96.7026],
+        ["Nevada", "Carson City", 39.1638, -119.7674],
+        ["New Hampshire", "Concord", 43.2081, -71.5376],
+        ["New Jersey", "Trenton", 40.2206, -74.7597],
+        ["New Mexico", "Santa Fe", 35.687, -105.9378],
+        ["New York", "Albany", 42.6526, -73.7562],
+        ["North Carolina", "Raleigh", 35.7796, -78.6382],
+        ["North Dakota", "Bismarck", 46.8083, -100.7837],
+        ["Ohio", "Columbus", 39.9612, -82.9988],
+        ["Oklahoma", "Oklahoma City", 35.4676, -97.5164],
+        ["Oregon", "Salem", 44.9429, -123.0351],
+        ["Pennsylvania", "Harrisburg", 40.2732, -76.8867],
+        ["Rhode Island", "Providence", 41.824, -71.4128],
+        ["South Carolina", "Columbia", 34.0007, -81.0348],
+        ["South Dakota", "Pierre", 44.3683, -100.351],
+        ["Tennessee", "Nashville", 36.1627, -86.7816],
+        ["Texas", "Austin", 30.2672, -97.7431],
+        ["Utah", "Salt Lake City", 40.7608, -111.891],
+        ["Vermont", "Montpelier", 44.2601, -72.5754],
+        ["Virginia", "Richmond", 37.5407, -77.436],
+        ["Washington", "Olympia", 47.0379, -122.9007],
+        ["West Virginia", "Charleston", 38.3498, -81.6326],
+        ["Wisconsin", "Madison", 43.0731, -89.4012],
+        ["Wyoming", "Cheyenne", 41.14, -104.8202]
+      ];
+      const CAPMAP = {};
+      CAPS.forEach(c => CAPMAP[c[0]] = c);
+
+      // Pacific islands & territories: [name, lat, lon]
+      const ISL = [
+        ["Fiji", -17.8, 177.9],
+        ["Samoa", -13.75, -172.1],
+        ["American Samoa", -14.27, -170.7],
+        ["Tonga", -21.18, -175.2],
+        ["Vanuatu", -17.7, 168.3],
+        ["Solomon Islands", -9.6, 160.2],
+        ["Papua New Guinea", -6.3, 144.0],
+        ["Kiribati", 1.4, 173.0],
+        ["Tuvalu", -8.5, 179.2],
+        ["Nauru", -0.53, 166.93],
+        ["Marshall Islands", 7.1, 171.4],
+        ["Micronesia", 6.9, 158.2],
+        ["Palau", 7.5, 134.6],
+        ["New Zealand", -41.29, 174.78],
+        ["Cook Islands", -21.2, -159.8],
+        ["Niue", -19.05, -169.87],
+        ["French Polynesia", -17.55, -149.6],
+        ["New Caledonia", -21.5, 165.5],
+        ["Hawaii", 21.3, -157.85],
+        ["Guam", 13.45, 144.78],
+        ["Northern Mariana Islands", 15.2, 145.75],
+        ["Easter Island", -27.1, -109.35],
+        ["Pitcairn Islands", -25.07, -130.1]
+      ];
+
+      const L = s => s.split('|');
+      const AFR = L("Algeria|Angola|Benin|Botswana|Burkina Faso|Burundi|Cameroon|Central African Rep.|Chad|Dem. Rep. Congo|Djibouti|Egypt|Eq. Guinea|Eritrea|eSwatini|Ethiopia|Gabon|Gambia|Ghana|Guinea|Guinea-Bissau|Ivory Coast|Kenya|Lesotho|Liberia|Libya|Madagascar|Malawi|Mali|Mauritania|Morocco|Mozambique|Namibia|Niger|Nigeria|Republic of the Congo|Rwanda|S. Sudan|Senegal|Sierra Leone|Somalia|South Africa|Sudan|Tanzania|Togo|Tunisia|Uganda|Zambia|Zimbabwe");
+      const EUR = L("Albania|Austria|Belarus|Belgium|Bosnia and Herz.|Bulgaria|Croatia|Cyprus|Czechia|Denmark|Estonia|Finland|France|Germany|Greece|Hungary|Iceland|Ireland|Italy|Kosovo|Latvia|Lithuania|Luxembourg|Moldova|Montenegro|Netherlands|North Macedonia|Norway|Poland|Portugal|Romania|Russia|Serbia|Slovakia|Slovenia|Spain|Sweden|Switzerland|Turkey|Ukraine|United Kingdom");
+      const ASI = L("Afghanistan|Armenia|Azerbaijan|Bangladesh|Bhutan|Brunei|Cambodia|China|Georgia|India|Indonesia|Iran|Iraq|Israel|Japan|Jordan|Kazakhstan|Kuwait|Kyrgyzstan|Laos|Lebanon|Malaysia|Mongolia|Myanmar|Nepal|North Korea|Oman|Pakistan|Philippines|Qatar|Russia|Saudi Arabia|South Korea|Sri Lanka|Syria|Taiwan|Tajikistan|Thailand|Timor-Leste|Turkey|Turkmenistan|United Arab Emirates|Uzbekistan|Vietnam|Yemen");
+      const NAM = L("Bahamas|Belize|Canada|Costa Rica|Cuba|Dominican Rep.|El Salvador|Greenland|Guatemala|Haiti|Honduras|Jamaica|Mexico|Nicaragua|Panama|Trinidad and Tobago|United States of America");
+      const SAM = L("Argentina|Bolivia|Brazil|Chile|Colombia|Ecuador|Guyana|Paraguay|Peru|Suriname|Uruguay|Venezuela");
+      const OCE = L("Australia|Fiji|New Zealand|Papua New Guinea|Solomon Is.|Vanuatu");
+      const ALL = [...new Set([].concat(AFR, EUR, ASI, NAM, SAM, OCE))];
+
+      const REG = {
+        world: {
+          names: ALL,
+          box: [-180, -57, 180, 84]
+        },
+        europe: {
+          names: EUR,
+          box: [-25, 34, 45, 72],
+          conic: true
+        },
+        asia: {
+          names: ASI,
+          box: [25, -11, 148, 70]
+        },
+        africa: {
+          names: AFR,
+          box: [-20, -36, 53, 38]
+        },
+        namerica: {
+          names: NAM,
+          box: [-170, 6, -18, 80]
+        },
+        samerica: {
+          names: SAM,
+          box: [-83, -56, -34, 13]
+        },
+        oceania: {
+          names: OCE,
+          box: [110, -48, 180, 3]
+        }
+      };
+      const DISP = {
+        "Bosnia and Herz.": "Bosnia & Herzegovina",
+        "Central African Rep.": "Central African Republic",
+        "Dem. Rep. Congo": "DR Congo",
+        "Dominican Rep.": "Dominican Republic",
+        "Eq. Guinea": "Equatorial Guinea",
+        "eSwatini": "Eswatini",
+        "S. Sudan": "South Sudan",
+        "Solomon Is.": "Solomon Islands",
+        "United States of America": "United States",
+        "Republic of the Congo": "Rep. of the Congo"
+      };
+      const dn = id => DISP[id] || id;
+
+      // alternate spellings accepted in "Hard" (typed) mode
+      const ALIASES = {
+        "United States of America": ["usa", "us", "united states of america", "america"],
+        "United Kingdom": ["uk", "great britain", "britain"],
+        "Czechia": ["czech republic", "czech"],
+        "Ivory Coast": ["cote d ivoire"],
+        "Dem. Rep. Congo": ["democratic republic of the congo", "democratic republic of congo", "drc", "dr congo", "congo kinshasa", "congo dr"],
+        "Republic of the Congo": ["congo", "republic of congo", "congo brazzaville", "rep of congo"],
+        "Central African Rep.": ["central african republic", "car"],
+        "Eq. Guinea": ["equatorial guinea"],
+        "eSwatini": ["eswatini", "swaziland"],
+        "S. Sudan": ["south sudan"],
+        "Solomon Is.": ["solomon islands"],
+        "Bosnia and Herz.": ["bosnia", "bosnia herzegovina", "bosnia and herzegovina"],
+        "Dominican Rep.": ["dominican republic"],
+        "Myanmar": ["burma"],
+        "Timor-Leste": ["east timor", "timor leste"],
+        "North Macedonia": ["macedonia"],
+        "Turkey": ["turkiye"],
+        "Netherlands": ["holland"],
+        "Vietnam": ["viet nam"],
+        "North Korea": ["dprk"],
+        "South Korea": ["republic of korea", "s korea"],
+        "United Arab Emirates": ["uae"],
+        "Papua New Guinea": ["png"],
+        "Trinidad and Tobago": ["trinidad", "trinidad tobago"],
+        "Kyrgyzstan": ["kyrgyz republic"],
+        "Russia": ["russian federation"],
+        "Laos": ["lao"],
+        "Micronesia": ["federated states of micronesia", "fsm"],
+        "Easter Island": ["rapa nui"],
+        "French Polynesia": ["tahiti"],
+        "Northern Mariana Islands": ["marianas", "northern marianas", "saipan"],
+        "Pitcairn Islands": ["pitcairn"]
+      };
+
+      const MODES = {
+        us_states: {
+          title: 'US States',
+          desc: 'Tap each state',
+          nameDesc: 'Name the highlighted state',
+          icon: '🗺️',
+          kind: 'states',
+          us: true,
+          group: 'US'
+        },
+        us_caps: {
+          title: 'State Capitals',
+          desc: 'Find the capital city',
+          nameDesc: 'Name the highlighted capital',
+          icon: '📍',
+          kind: 'capdots',
+          us: true,
+          group: 'US'
+        },
+        us_cap2st: {
+          title: 'Capital → State',
+          nameTitle: 'State → Capital',
+          desc: 'Which state is it in?',
+          nameDesc: 'Name the state’s capital',
+          icon: '🏛️',
+          kind: 'cap2state',
+          us: true,
+          group: 'US'
+        },
+        w_world: {
+          title: 'World Countries',
+          desc: 'The whole planet',
+          nameDesc: 'Name the country',
+          icon: '🌍',
+          kind: 'country',
+          region: 'world',
+          group: 'W'
+        },
+        w_europe: {
+          title: 'Europe',
+          desc: 'Countries',
+          nameDesc: 'Name the country',
+          icon: '🏰',
+          kind: 'country',
+          region: 'europe',
+          group: 'W'
+        },
+        w_asia: {
+          title: 'Asia',
+          desc: 'Countries',
+          nameDesc: 'Name the country',
+          icon: '🏯',
+          kind: 'country',
+          region: 'asia',
+          group: 'W'
+        },
+        w_africa: {
+          title: 'Africa',
+          desc: 'Countries',
+          nameDesc: 'Name the country',
+          icon: '🦁',
+          kind: 'country',
+          region: 'africa',
+          group: 'W'
+        },
+        w_namerica: {
+          title: 'North America',
+          desc: 'Countries',
+          nameDesc: 'Name the country',
+          icon: '🗽',
+          kind: 'country',
+          region: 'namerica',
+          group: 'W'
+        },
+        w_samerica: {
+          title: 'South America',
+          desc: 'Countries',
+          nameDesc: 'Name the country',
+          icon: '🦙',
+          kind: 'country',
+          region: 'samerica',
+          group: 'W'
+        },
+        w_oceania: {
+          title: 'Oceania',
+          desc: 'Countries',
+          nameDesc: 'Name the country',
+          icon: '🦘',
+          kind: 'country',
+          region: 'oceania',
+          group: 'W'
+        },
+        w_pacific: {
+          title: 'Pacific Islands',
+          desc: 'Find the island',
+          nameDesc: 'Name the island',
+          icon: '🏝️',
+          kind: 'islands',
+          region: 'pacific',
+          group: 'W'
+        }
+      };
+      Object.keys(MODES).forEach(k => MODES[k].key = k);
+      const isDot = m => m.kind === 'capdots' || m.kind === 'islands';
+      const titleOf = (m, st) => st === 'name' && m.nameTitle ? m.nameTitle : m.title;
+      const descOf = (m, st) => st === 'name' ? m.nameDesc : m.desc;
+
+      const URLS = {
+        us: 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json',
+        world: 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
+      };
+      const DATA = {};
+      async function ensure(m) {
+        if (typeof d3 === 'undefined' || typeof topojson === 'undefined') throw new Error('Map libraries failed to load.');
+        const k = m.us ? 'us' : 'world';
+        if (DATA[k]) return;
+        const r = await fetch(URLS[k]);
+        if (!r.ok) throw new Error('Map data HTTP ' + r.status);
+        const topo = await r.json();
+        let f;
+        if (k === 'us') f = topojson.feature(topo, topo.objects.states).features.filter(x => x.properties.name !== 'Puerto Rico');
+        else f = topojson.feature(topo, topo.objects.countries).features.filter(x => !['Antarctica', 'Fr. S. Antarctic Lands'].includes(x.properties.name));
+        f.forEach(x => x.id = x.properties.name);
+        DATA[k] = f;
+      }
+
+      /* ================= STATE ================= */
+      let opts = Object.assign({
+        len: '10',
+        hint: 3,
+        style: 'find',
+        diff: 'easy'
+      }, store.get('geotap_opts', {}));
+      let G = null; // current game
+      const M = {}; // map internals
+
+      /* ================= STATS STORAGE ================= */
+      // one record per mode+style (combined across 10/25/all and across difficulties)
+      const STC = {};
+      const stKey = (k, st) => `geotap_st_${k}_${st}`;
+
+      function getStats(k, st) {
+        const key = stKey(k, st);
+        if (!STC[key]) {
+          let s = store.get(key, null);
+          if (!s) {
+            s = {
+              items: {},
+              runs: [],
+              games: 0,
+              playMs: 0
+            };
+            if (st === 'find')['10', '25', 'all'].forEach(l => { // import old personal bests
+              const b = store.get(`geotap_best_${k}_${l}`, null);
+              if (b) s.runs.push({
+                d: 0,
+                p: b.pct,
+                t: b.time,
+                n: l === 'all' ? 0 : +l,
+                l,
+                df: '-',
+                imp: 1
+              });
+            });
+          }
+          STC[key] = s;
+        }
+        return STC[key];
+      }
+
+      function saveStats(k, st) {
+        store.set(stKey(k, st), getStats(k, st))
+      }
+
+      function itemRec(s, id) {
+        return s.items[id] || (s.items[id] = {
+          a: 0,
+          f: 0,
+          w: 0,
+          r: 0,
+          t: 0,
+          n: 0,
+          bt: 0,
+          c: {}
+        })
+      }
+
+      function recordItem(cur, res) {
+        const s = getStats(G.key, G.style),
+          it = itemRec(s, cur.id);
+        const ms = Math.min(performance.now() - G.qStart, 60000);
+        it.a++;
+        if (!res.revealed && res.wrong === 0) it.f++;
+        it.w += res.wrong;
+        if (res.revealed) it.r++;
+        if (!res.revealed) {
+          it.t += ms;
+          it.n++;
+          if (!it.bt || ms < it.bt) it.bt = Math.round(ms)
+        }
+        saveStats(G.key, G.style);
+      }
+
+      function noteConf(target, chosen) {
+        const it = itemRec(getStats(G.key, G.style), target);
+        it.c[chosen] = (it.c[chosen] || 0) + 1;
+      }
+      const isMastered = it => it.a >= 3 && it.f / it.a >= .8;
+
+      /* ================= HELPERS ================= */
+      function show(id) {
+        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        ['menu', 'game', 'results', 'info'].forEach(s => $('#' + s).classList.toggle('hidden', s !== id));
+      }
+
+      function fmt(ms) {
+        const s = Math.floor(ms / 1000);
+        return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
+      }
+
+      function fmtLong(ms) {
+        const m = Math.floor(ms / 60000);
+        return m < 60 ? m + 'm ' + Math.floor(ms / 1000 % 60) + 's' : Math.floor(m / 60) + 'h ' + (m % 60) + 'm'
+      }
+
+      function modeCount(m) {
+        return m.us ? 50 : m.kind === 'islands' ? ISL.length : REG[m.region].names.length
+      }
+
+      function shuffle(a) {
+        a = a.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]]
+        }
+        return a
+      }
+
+      // typed-answer matching
+      function norm(s) {
+        return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim().split(' ')
+          .map(w => w === 'st' ? 'saint' : w === 'mt' ? 'mount' : w).filter(w => w && w !== 'the').join(' ');
+      }
+
+      function lev(a, b) {
+        if (a === b) return 0;
+        const m = a.length,
+          n = b.length;
+        if (!m) return n;
+        if (!n) return m;
+        let prev = Array.from({
+          length: n + 1
+        }, (_, j) => j);
+        for (let i = 1; i <= m; i++) {
+          const cur = [i];
+          for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+          prev = cur;
+        }
+        return prev[n];
+      }
+
+      function mkKeys(ans, extra) {
+        return [...new Set([ans].concat(extra || []).map(norm).filter(Boolean))]
+      }
+
+      /* ================= ITEMS ================= */
+      function buildItems(m, style) {
+        const nm = style === 'name';
+        if (m.us) {
+          return CAPS.map(c => {
+            const st = c[0],
+              cp = c[1];
+            if (m.kind === 'states') return nm ?
+              {
+                id: st,
+                ans: st,
+                label: st,
+                show: st,
+                rev: st,
+                sn: st,
+                q: 'Name this <b>state</b>',
+                keys: mkKeys(st)
+              } :
+              {
+                id: st,
+                label: st,
+                rev: st,
+                sn: st,
+                q: `Find <b>${st}</b>`
+              };
+            if (m.kind === 'capdots') return nm ?
+              {
+                id: st,
+                ans: cp,
+                label: cp,
+                show: `${cp} (${st})`,
+                rev: `${cp} (${st})`,
+                sn: cp,
+                q: 'Name this <b>capital city</b>',
+                keys: mkKeys(cp)
+              } :
+              {
+                id: st,
+                label: cp,
+                rev: `${cp} (${st})`,
+                sn: cp,
+                q: `Find the capital of <b>${st}</b>`
+              };
+            return nm ?
+              {
+                id: st,
+                ans: cp,
+                label: st,
+                show: cp,
+                rev: `${st} → ${cp}`,
+                sn: cp,
+                q: 'Name this state’s <b>capital</b>',
+                keys: mkKeys(cp)
+              } :
+              {
+                id: st,
+                label: st,
+                rev: `${cp} → ${st}`,
+                sn: st,
+                q: `<b>${cp}</b> is the capital of…`
+              };
+          });
+        }
+        if (m.kind === 'islands') return ISL.map(i => {
+          const n = i[0];
+          return nm ? {
+              id: n,
+              ans: n,
+              label: n,
+              show: n,
+              rev: n,
+              sn: n,
+              q: 'Name this <b>island or territory</b>',
+              keys: mkKeys(n, ALIASES[n])
+            } :
+            {
+              id: n,
+              label: n,
+              rev: n,
+              sn: n,
+              q: `Find <b>${n}</b>`
+            }
+        });
+        const have = DATA.world ? new Set(DATA.world.map(f => f.id)) : null;
+        return REG[m.region].names.filter(n => !have || have.has(n)).map(n => {
+          const d = dn(n);
+          return nm ? {
+              id: n,
+              ans: d,
+              label: d,
+              show: d,
+              rev: d,
+              sn: d,
+              q: 'Name this <b>country</b>',
+              keys: mkKeys(d, [n].concat(ALIASES[n] || []))
+            } :
+            {
+              id: n,
+              label: d,
+              rev: d,
+              sn: d,
+              q: `Find <b>${d}</b>`
+            };
+        });
+      }
+
+      /* ================= MENU ================= */
+      const STYLE_NOTES = {
+        find: 'A name appears and you tap it on the map.',
+        easy: 'A spot is highlighted. Pick the answer from 4 choices.',
+        medium: 'A spot is highlighted. Pick the answer from the full list.',
+        hard: 'A spot is highlighted. Type the answer yourself (small typos are OK).'
+      };
+
+      function renderMenu() {
+        [
+          ['#optLen', 'len'],
+          ['#optHint', 'hint'],
+          ['#optStyle', 'style'],
+          ['#optDiff', 'diff']
+        ].forEach(([sel, k]) => {
+          document.querySelectorAll(sel + ' button').forEach(b => b.classList.toggle('on', String(opts[k]) === b.dataset.v));
+        });
+        $('#rowDiff').classList.toggle('hidden', opts.style !== 'name');
+        $('#styleNote').textContent = opts.style === 'find' ? STYLE_NOTES.find : STYLE_NOTES[opts.diff];
+        for (const [grid, grp] of [
+            ['#gridUS', 'US'],
+            ['#gridWorld', 'W']
+          ]) {
+          const el = $(grid);
+          el.innerHTML = '';
+          Object.values(MODES).filter(m => m.group === grp).forEach(m => {
+            const s = getStats(m.key, opts.style),
+              N = modeCount(m);
+            const seen = Object.keys(s.items).length;
+            const mast = Object.values(s.items).filter(isMastered).length;
+            const c = document.createElement('div');
+            c.className = 'card';
+            c.setAttribute('role', 'button');
+            c.innerHTML = `<button class="info" aria-label="Stats">ⓘ</button><span class="ic">${m.icon}</span>
+        <span class="tt">${esc(titleOf(m,opts.style))}</span>
+        <span class="ds">${esc(descOf(m,opts.style))} · ${N}</span>
+        <span class="bs ${seen?'':'new'}">${seen?`★ ${mast}/${N} mastered`:'New'}</span>
+        <span class="pb"><i style="width:${Math.min(100,mast/N*100)}%"></i></span>`;
+            c.onclick = () => startGame(m.key);
+            c.querySelector('.info').onclick = e => {
+              e.stopPropagation();
+              openInfo(m.key)
+            };
+            el.appendChild(c);
+          });
+        }
+      }
+      [
+        ['#optLen', 'len'],
+        ['#optHint', 'hint'],
+        ['#optStyle', 'style'],
+        ['#optDiff', 'diff']
+      ].forEach(([sel, k]) => {
+        $(sel).addEventListener('click', e => {
+          const b = e.target.closest('button');
+          if (!b) return;
+          opts[k] = k === 'hint' ? +b.dataset.v : b.dataset.v;
+          store.set('geotap_opts', opts);
+          renderMenu();
+        });
+      });
+
+      /* ================= GAME SETUP ================= */
+      async function startGame(key, cfg) {
+        cfg = cfg || {};
+        const m = MODES[key],
+          style = cfg.style || opts.style,
+          diff = cfg.diff || opts.diff;
+        $('#loading').classList.remove('hidden');
+        $('#err').textContent = '';
+        $('#errBack').classList.add('hidden');
+        $('.spin').style.display = '';
+        $('#loadTxt').textContent = 'Loading map…';
+        try {
+          await ensure(m);
+        } catch (e) {
+          $('.spin').style.display = 'none';
+          $('#loadTxt').textContent = 'Couldn’t load the map';
+          $('#err').textContent = (e.message || e) + ' Check your connection and try again.';
+          $('#errBack').classList.remove('hidden');
+          return;
+        }
+        $('#loading').classList.add('hidden');
+
+        const pool = buildItems(m, style),
+          pmap = {};
+        pool.forEach(p => pmap[p.id] = p);
+        let items = cfg.only ? pool.filter(i => cfg.only.includes(i.id)) : pool.slice();
+        items = shuffle(items);
+        if (!cfg.only && opts.len !== 'all') items = items.slice(0, +opts.len);
+        if (!items.length) {
+          $('#loading').classList.remove('hidden');
+          $('.spin').style.display = 'none';
+          $('#loadTxt').textContent = 'Nothing to practice yet';
+          $('#errBack').classList.remove('hidden');
+          return;
+        }
+
+        G = {
+          key,
+          mode: m,
+          style,
+          diff,
+          pool,
+          pmap,
+          items,
+          idx: -1,
+          res: {},
+          wrongs: 0,
+          hintAfter: +opts.hint,
+          len: opts.len,
+          pts: (style === 'name' && diff === 'easy') ? [1, .4, .1, 0] : [1, .5, .25, .1, .05],
+          t0: 0,
+          qStart: 0,
+          timer: null,
+          locked: false,
+          revealed: false,
+          done: false,
+          cur: null,
+          only: !!cfg.only,
+          zoomDirty: false,
+          btns: {},
+          input: null
+        };
+        show('game');
+        $('#timer').textContent = '0:00';
+        $('#miss').textContent = '✗ 0';
+        const zh = $('#zoomhint');
+        zh.style.opacity = 1;
+        setTimeout(() => zh.style.opacity = 0, 3500);
+        buildAnswerUI();
+        requestAnimationFrame(() => {
+          renderMap();
+          G.t0 = performance.now();
+          G.timer = setInterval(() => {
+            $('#timer').textContent = fmt(performance.now() - G.t0)
+          }, 250);
+          advance();
+        });
+      }
+      $('#errBack').onclick = () => {
+        $('#loading').classList.add('hidden');
+        renderMenu();
+        show('menu')
+      };
+
+      /* ================= MAP ================= */
+      function bigPoly(f) {
+        const g = f.geometry;
+        if (g.type === 'Polygon') return f;
+        let best = null,
+          ba = -1;
+        for (const c of g.coordinates) {
+          const p = {
+            type: 'Polygon',
+            coordinates: c
+          };
+          const a = d3.geoArea(p);
+          if (a > ba) {
+            ba = a;
+            best = p
+          }
+        }
+        return {
+          type: 'Feature',
+          properties: {},
+          geometry: best
+        };
+      }
+
+      function renderMap() {
+        const wrap = $('#mapwrap');
+        const W = wrap.clientWidth,
+          H = wrap.clientHeight;
+        if (!W || !H) return;
+        M.W = W;
+        M.H = H;
+        const svg = d3.select('#map').attr('width', W).attr('height', H).attr('viewBox', `0 0 ${W} ${H}`);
+        svg.selectAll('*').remove();
+        const m = G.mode,
+          kind = m.kind,
+          feats = m.us ? DATA.us : DATA.world,
+          dots = isDot(m);
+        let proj, tset;
+        if (m.us) {
+          proj = d3.geoAlbersUsa();
+          proj.fitExtent([
+            [6, 6],
+            [W - 6, H - 6]
+          ], {
+            type: 'FeatureCollection',
+            features: feats
+          });
+          tset = new Set(CAPS.map(c => c[0]));
+        } else if (kind === 'islands') {
+          proj = d3.geoNaturalEarth1().rotate([170, 0]);
+          proj.fitExtent([
+            [6, 6],
+            [W - 6, H - 6]
+          ], {
+            type: 'MultiPoint',
+            coordinates: [
+              [115, -48],
+              [-95, -48],
+              [115, 32],
+              [-95, 32],
+              [-170, -48],
+              [-170, 32],
+              [115, -8],
+              [-95, -8]
+            ]
+          });
+          tset = new Set();
+        } else {
+          const r = REG[m.region];
+          proj = r.conic ? d3.geoConicConformal().rotate([-15, 0]).parallels([38, 62]) : d3.geoNaturalEarth1();
+          const [w, s, e, n] = r.box, mx = (w + e) / 2, my = (s + n) / 2;
+          proj.fitExtent([
+            [6, 6],
+            [W - 6, H - 6]
+          ], {
+            type: 'MultiPoint',
+            coordinates: [
+              [w, s],
+              [e, s],
+              [e, n],
+              [w, n],
+              [mx, s],
+              [mx, n],
+              [w, my],
+              [e, my]
+            ]
+          });
+          tset = new Set(r.names);
+        }
+        const path = d3.geoPath(proj);
+        Object.assign(M, {
+          proj,
+          path,
+          els: {},
+          dots: {},
+          pos: {},
+          cent: {},
+          fmap: {},
+          t: d3.zoomIdentity,
+          pulseEl: null
+        });
+        feats.forEach(f => M.fmap[f.id] = f);
+        const g = svg.append('g');
+        M.g = g;
+
+        g.selectAll('path').data(feats).join('path')
+          .attr('d', d => path(d) || '')
+          .attr('class', d => 'shape' + (tset.has(d.id) ? '' : ' ctx') + (!dots && tset.has(d.id) ? ' tgt' : ''))
+          .attr('data-id', d => d.id)
+          .each(function(d) {
+            M.els[d.id] = this
+          });
+
+        if (dots) {
+          const dd = kind === 'capdots' ? CAPS.map(c => [c[0], c[3], c[2]]) : ISL.map(i => [i[0], i[2], i[1]]);
+          dd.forEach(d => {
+            const p = proj([d[1], d[2]]);
+            if (p && !isNaN(p[0])) M.pos[d[0]] = p
+          });
+          g.selectAll('circle.dot').data(dd.filter(d => M.pos[d[0]])).join('circle')
+            .attr('class', 'dot').attr('cx', d => M.pos[d[0]][0]).attr('cy', d => M.pos[d[0]][1])
+            .each(function(d) {
+              M.dots[d[0]] = this
+            });
+          if (G.style === 'name')
+            for (const k in M.dots) M.dots[k].style.display = 'none';
+        }
+        M.ring = g.append('circle').attr('class', 'ring').style('display', 'none');
+        M.lbl = g.append('text').attr('class', 'lbl').style('display', 'none');
+
+        M.zoom = d3.zoom().scaleExtent([1, 70]).translateExtent([
+            [-W * .3, -H * .3],
+            [W * 1.3, H * 1.3]
+          ])
+          .on('zoom', e => {
+            M.t = e.transform;
+            g.attr('transform', e.transform);
+            applyK(e.transform.k)
+          });
+        svg.call(M.zoom).on('dblclick.zoom', null);
+        svg.call(M.zoom.transform, d3.zoomIdentity);
+        applyK(1);
+
+        for (const id in G.res) paint(id);
+        if (G.revealed && G.cur) highlight(G.cur.id);
+      }
+
+      function applyK(k) {
+        const dr = 5 / k;
+        for (const id in M.dots) {
+          M.dots[id].setAttribute('r', dr);
+          M.dots[id].style.strokeWidth = 1.2 / k
+        }
+        M.ring.attr('r', (M.pos[G.cur && G.cur.id] ? 14 : 20) / k).style('stroke-width', (3 / k) + 'px');
+        M.lbl.style('font-size', (14 / k) + 'px').style('stroke-width', (4 / k) + 'px');
+      }
+
+      function elOf(id) {
+        return isDot(G.mode) ? M.dots[id] : M.els[id]
+      }
+
+      function paint(id) {
+        const el = elOf(id);
+        if (!el) return;
+        const r = G.res[id];
+        el.classList.remove('ok1', 'ok2', 'ok3', 'miss');
+        if (!r) return;
+        el.classList.add(r.revealed ? 'miss' : r.wrong === 0 ? 'ok1' : r.wrong === 1 ? 'ok2' : 'ok3');
+      }
+
+      function center(id) {
+        if (M.pos[id]) return M.pos[id];
+        if (!M.cent[id]) M.cent[id] = M.path.centroid(bigPoly(M.fmap[id]));
+        return M.cent[id];
+      }
+
+      function flash(id) {
+        const el = elOf(id);
+        if (!el) return;
+        el.classList.remove('flash');
+        void el.getBoundingClientRect();
+        el.classList.add('flash');
+        setTimeout(() => el.classList.remove('flash'), 560);
+      }
+      let lblTimer = null;
+
+      function showLabel(id, text, ms) {
+        const c = center(id);
+        if (!c || isNaN(c[0])) return;
+        const dot = !!M.pos[id];
+        M.lbl.attr('x', c[0]).attr('y', c[1]).attr('dy', dot ? '-0.9em' : '0.35em').text(text).style('display', null);
+        clearTimeout(lblTimer);
+        if (ms) lblTimer = setTimeout(() => M.lbl.style('display', 'none'), ms);
+      }
+
+      function highlight(id, o) {
+        o = Object.assign({
+          ring: true,
+          label: true
+        }, o);
+        const c = center(id);
+        if (!c || isNaN(c[0])) return;
+        if (o.ring) {
+          M.ring.attr('cx', c[0]).attr('cy', c[1]).style('display', null);
+          applyK(M.t.k)
+        }
+        const el = elOf(id);
+        if (el) {
+          el.classList.add('pulse');
+          M.pulseEl = el
+        }
+        if (o.label) showLabel(id, G.cur.label, 0);
+      }
+
+      function clearPulse() {
+        if (M.pulseEl) {
+          M.pulseEl.classList.remove('pulse');
+          M.pulseEl = null
+        }
+      }
+
+      function clearHighlight() {
+        M.ring && M.ring.style('display', 'none');
+        M.lbl && M.lbl.style('display', 'none');
+        clearPulse();
+      }
+
+      function zoomTo(id) {
+        const f = G.mode.kind === 'islands' ? null : M.fmap[id];
+        const dot = !!M.pos[id];
+        let k;
+        if (f) {
+          const b = M.path.bounds(bigPoly(f));
+          const dx = b[1][0] - b[0][0],
+            dy = b[1][1] - b[0][1];
+          k = 0.45 / Math.max(dx / M.W, dy / M.H, 1e-6);
+          k = dot ? Math.min(6, Math.max(2.5, k)) : Math.min(14, Math.max(1, k));
+        } else if (dot) k = 4;
+        else return;
+        const c = center(id);
+        const t = d3.zoomIdentity.translate(M.W / 2, M.H / 2).scale(k).translate(-c[0], -c[1]);
+        d3.select('#map').transition().duration(650).call(M.zoom.transform, t);
+        G.zoomDirty = true;
+      }
+
+      function resetZoom() {
+        d3.select('#map').transition().duration(450).call(M.zoom.transform, d3.zoomIdentity)
+      }
+      $('#resetZoom').onclick = () => M.zoom && resetZoom();
+
+      /* ================= TAP HANDLING (Find mode) ================= */
+      (function() {
+        const el = $('#map');
+        const ptrs = new Set();
+        let down = null,
+          maxP = 0;
+        el.addEventListener('pointerdown', e => {
+          ptrs.add(e.pointerId);
+          if (ptrs.size === 1) {
+            down = {
+              x: e.clientX,
+              y: e.clientY,
+              t: performance.now()
+            };
+            maxP = 1
+          } else maxP = Math.max(maxP, ptrs.size);
+        });
+        el.addEventListener('pointerup', e => {
+          const wasSingle = maxP === 1;
+          ptrs.delete(e.pointerId);
+          if (ptrs.size === 0) {
+            if (down && wasSingle && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 10 && performance.now() - down.t < 800) onTap(e);
+            down = null;
+            maxP = 0;
+          }
+        });
+        el.addEventListener('pointercancel', e => {
+          ptrs.delete(e.pointerId);
+          if (!ptrs.size) {
+            down = null;
+            maxP = 0
+          }
+        });
+      })();
+
+      function onTap(e) {
+        if (!G || G.done || G.locked || G.revealed || !G.cur || G.style !== 'find') return;
+        let id = null;
+        if (isDot(G.mode)) {
+          const r = $('#map').getBoundingClientRect(),
+            x = e.clientX - r.left,
+            y = e.clientY - r.top,
+            t = M.t;
+          let bd = 28;
+          for (const k in M.pos) {
+            const d = Math.hypot(M.pos[k][0] * t.k + t.x - x, M.pos[k][1] * t.k + t.y - y);
+            if (d < bd) {
+              bd = d;
+              id = k
+            }
+          }
+        } else {
+          const el = document.elementFromPoint(e.clientX, e.clientY);
+          if (el && el.classList && el.classList.contains('tgt')) id = el.getAttribute('data-id');
+        }
+        if (id) guess(id);
+      }
+
+      /* ================= ANSWER UI (Name mode) ================= */
+      function buildAnswerUI() {
+        const box = $('#answer');
+        box.innerHTML = '';
+        G.btns = {};
+        G.input = null;
+        if (G.style !== 'name') {
+          box.classList.add('hidden');
+          return
+        }
+        box.classList.remove('hidden');
+        if (G.diff === 'medium') {
+          const wrap = document.createElement('div');
+          wrap.className = 'a-med';
+          let last = '';
+          G.pool.slice().sort((a, b) => a.ans.localeCompare(b.ans)).forEach(p => {
+            const ch = p.ans[0].toUpperCase();
+            if (ch !== last) {
+              last = ch;
+              const h = document.createElement('div');
+              h.className = 'ltr';
+              h.textContent = ch;
+              wrap.appendChild(h)
+            }
+            const b = document.createElement('button');
+            b.className = 'a-btn';
+            b.textContent = p.ans;
+            b.dataset.id = p.id;
+            G.btns[p.id] = b;
+            wrap.appendChild(b);
+          });
+          wrap.addEventListener('click', e => {
+            const b = e.target.closest('.a-btn');
+            if (b && !b.disabled) submitId(b.dataset.id)
+          });
+          box.appendChild(wrap);
+        } else if (G.diff === 'hard') {
+          box.innerHTML = `<div class="a-hard"><input id="ans" type="text" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Type your answer…"><button class="btn primary" id="goBtn" style="flex:none;padding:11px 18px">Go</button></div>`;
+          G.input = $('#ans');
+          G.input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              submitText()
+            }
+          });
+          $('#goBtn').addEventListener('pointerdown', e => e.preventDefault());
+          $('#goBtn').addEventListener('click', submitText);
+        }
+      }
+
+      function resetAnswerUI() {
+        if (G.style !== 'name') return;
+        const cur = G.cur,
+          box = $('#answer');
+        if (G.diff === 'easy') {
+          box.innerHTML = '';
+          G.btns = {};
+          const wrap = document.createElement('div');
+          wrap.className = 'a-easy';
+          const four = shuffle([cur].concat(shuffle(G.pool.filter(p => p.id !== cur.id)).slice(0, 3)));
+          four.forEach(p => {
+            const b = document.createElement('button');
+            b.className = 'a-btn';
+            b.textContent = p.ans;
+            b.dataset.id = p.id;
+            G.btns[p.id] = b;
+            wrap.appendChild(b);
+          });
+          wrap.addEventListener('click', e => {
+            const b = e.target.closest('.a-btn');
+            if (b && !b.disabled) submitId(b.dataset.id)
+          });
+          box.appendChild(wrap);
+        } else if (G.diff === 'medium') {
+          for (const id in G.btns) {
+            const b = G.btns[id];
+            b.className = 'a-btn';
+            b.disabled = false
+          }
+        } else {
+          G.input.value = '';
+          try {
+            G.input.focus({
+              preventScroll: true
+            })
+          } catch (e) {}
+        }
+      }
+
+      function submitId(id) {
+        if (!G || G.locked || G.revealed || G.done) return;
+        guess(id);
+      }
+
+      function matchAnswer(raw) {
+        const t = norm(raw);
+        if (!t) return {
+          kind: 'empty'
+        };
+        let best = null,
+          bd = 99;
+        for (const p of G.pool) {
+          for (const k of p.keys) {
+            const d = k === t ? 0 : lev(t, k);
+            const tol = k.length >= 12 ? 2 : k.length >= 6 ? 1 : 0;
+            if (d <= tol && (d < bd || (d === bd && p.id === G.cur.id))) {
+              bd = d;
+              best = p
+            }
+          }
+        }
+        if (!best) return {
+          kind: 'none'
+        };
+        return best.id === G.cur.id ? {
+          kind: 'ok'
+        } : {
+          kind: 'other',
+          id: best.id
+        };
+      }
+
+      function submitText() {
+        if (!G || G.done) return;
+        if (G.revealed) {
+          advance();
+          return
+        }
+        if (G.locked) return;
+        const raw = G.input.value.trim();
+        if (!raw) {
+          shake();
+          return
+        }
+        const r = matchAnswer(raw);
+        if (r.kind === 'ok') guess(G.cur.id);
+        else guess(r.kind === 'other' ? r.id : null);
+      }
+
+      function shake() {
+        const i = G.input;
+        if (!i) return;
+        i.classList.remove('shake');
+        void i.offsetWidth;
+        i.classList.add('shake')
+      }
+
+      function hintText(cur) {
+        if (cur.wrong <= 1) return `starts with “${cur.ans[0]}”`;
+        return cur.ans.split(' ').map(w => w.split('').map((ch, i) => i === 0 ? ch : (/[a-z]/i.test(ch) ? '_' : ch)).join(' ')).join('   ');
+      }
+
+      /* ================= GAME FLOW ================= */
+      function setFb(t, c) {
+        const f = $('#fb');
+        f.textContent = t;
+        f.className = c || ''
+      }
+
+      function setBtn() {
+        const b = $('#showBtn');
+        if (G.revealed) {
+          b.textContent = G.idx >= G.items.length - 1 ? 'Finish →' : 'Next →';
+          b.classList.add('primary')
+        } else {
+          b.textContent = '👁 Show me';
+          b.classList.remove('primary')
+        }
+      }
+
+      function presentTarget() { // Name mode: highlight the thing to identify
+        const id = G.cur.id;
+        if (isDot(G.mode)) {
+          for (const k in M.dots) M.dots[k].style.display = (k === id) ? '' : 'none';
+          highlight(id, {
+            ring: true,
+            label: false
+          });
+          if (M.t.k > 1.01) resetZoom();
+        } else {
+          highlight(id, {
+            ring: false,
+            label: false
+          });
+          const b = M.path.bounds(bigPoly(M.fmap[id]));
+          const sz = Math.max((b[1][0] - b[0][0]) / M.W, (b[1][1] - b[0][1]) / M.H);
+          if (isFinite(sz) && sz < 0.07) zoomTo(id);
+          else if (M.t.k > 1.01 || G.zoomDirty) {
+            resetZoom();
+            G.zoomDirty = false
+          }
+        }
+      }
+
+      function advance() {
+        if (!G || G.done) return;
+        if (G.cur && G.style === 'name') {
+          const el = elOf(G.cur.id);
+          el && el.classList.remove('ok1', 'ok2', 'ok3', 'miss')
+        }
+        G.idx++;
+        if (G.idx >= G.items.length) return finish();
+        G.cur = Object.assign({
+          wrong: 0
+        }, G.items[G.idx]);
+        G.revealed = false;
+        G.locked = false;
+        G.qStart = performance.now();
+        clearHighlight();
+        if (G.style === 'name') presentTarget();
+        else if (G.zoomDirty) {
+          resetZoom();
+          G.zoomDirty = false
+        }
+        $('#q').innerHTML = G.cur.q;
+        $('#prog').textContent = `${G.idx+1}/${G.items.length}`;
+        $('#bar i').style.width = (G.idx / G.items.length * 100) + '%';
+        setFb('');
+        setBtn();
+        resetAnswerUI();
+      }
+
+      function findName(id) {
+        return G.mode.kind === 'capdots' ? CAPMAP[id][1] : dn(id)
+      }
+
+      function guess(id) {
+        const cur = G.cur,
+          name = G.style === 'name',
+          g = G;
+        if (id === cur.id) {
+          G.res[cur.id] = {
+            wrong: cur.wrong,
+            revealed: false
+          };
+          recordItem(cur, G.res[cur.id]);
+          clearPulse();
+          if (name) M.ring.style('display', 'none');
+          paint(cur.id);
+          showLabel(cur.id, cur.label, name ? 1100 : 1000);
+          if (name && G.btns[cur.id]) G.btns[cur.id].classList.add('right');
+          setFb(name ? `✓ ${cur.show}` : (cur.wrong === 0 ? '✓ Correct!' : '✓ Got it'), 'good');
+          G.locked = true;
+          setTimeout(() => {
+            if (G === g) advance()
+          }, name ? (cur.wrong === 0 ? 800 : 1100) : (cur.wrong === 0 ? 450 : 700));
+        } else {
+          cur.wrong++;
+          G.wrongs++;
+          $('#miss').textContent = '✗ ' + G.wrongs;
+          if (id) noteConf(cur.id, id);
+          if (!name) {
+            flash(id);
+            // intentional: shows what you actually tapped (state name in the Capital → State mode)
+            setFb(`✗ That's ${findName(id)}`, 'bad');
+          } else {
+            if (id && G.btns[id]) {
+              G.btns[id].classList.add('wrong');
+              G.btns[id].disabled = true
+            }
+            let msg = id ? `✗ Not ${G.pmap[id].ans}` : '✗ Not quite';
+            const limit = Math.min(G.hintAfter, G.diff === 'easy' ? 3 : 99);
+            if (G.diff === 'hard' && cur.wrong < limit) msg += ` · ${hintText(cur)}`;
+            setFb(msg, 'bad');
+            if (G.diff === 'hard') shake();
+          }
+          if (navigator.vibrate) try {
+            navigator.vibrate(40)
+          } catch (e) {}
+          const limit = Math.min(G.hintAfter, G.diff === 'easy' && name ? 3 : 99);
+          if (cur.wrong >= limit) reveal(true);
+        }
+      }
+
+      function reveal(auto) {
+        if (G.revealed || G.locked) return;
+        const cur = G.cur;
+        G.revealed = true;
+        G.res[cur.id] = {
+          wrong: cur.wrong,
+          revealed: true
+        };
+        recordItem(cur, G.res[cur.id]);
+        paint(cur.id);
+        if (G.style === 'find') {
+          highlight(cur.id);
+          zoomTo(cur.id);
+          setFb(auto ? 'Here it is 👆 — remember this one!' : 'Here it is 👆', 'info');
+        } else {
+          showLabel(cur.id, cur.label, 0);
+          for (const id in G.btns) {
+            const b = G.btns[id];
+            b.disabled = true;
+            if (id === cur.id) b.classList.add('right')
+          }
+          setFb(`It's ${cur.show} — remember this one!`, 'info');
+        }
+        setBtn();
+      }
+      $('#showBtn').addEventListener('pointerdown', e => {
+        if (G && G.input) e.preventDefault()
+      });
+      $('#showBtn').onclick = () => {
+        if (!G || G.done || G.locked) return;
+        if (G.revealed) advance();
+        else reveal(false);
+      };
+      $('#quit').onclick = () => {
+        if (!G || G.done) return;
+        if (confirm('Quit this round?')) {
+          clearInterval(G.timer);
+          G.done = true;
+          renderMenu();
+          show('menu')
+        }
+      };
+
+      /* ================= RESULTS ================= */
+      const GRADES = [
+        [97, 'A+'],
+        [93, 'A'],
+        [90, 'A-'],
+        [87, 'B+'],
+        [83, 'B'],
+        [80, 'B-'],
+        [77, 'C+'],
+        [73, 'C'],
+        [70, 'C-'],
+        [60, 'D'],
+        [0, 'F']
+      ];
+      const gradeOf = p => GRADES.find(g => p >= g[0])[1];
+
+      function finish() {
+        G.done = true;
+        clearInterval(G.timer);
+        const time = performance.now() - G.t0,
+          n = G.items.length;
+        let pts = 0,
+          first = 0,
+          tricky = [];
+        G.items.forEach(it => {
+          const r = G.res[it.id] || {
+            wrong: 0,
+            revealed: true
+          };
+          pts += r.revealed ? 0 : G.pts[Math.min(r.wrong, G.pts.length - 1)];
+          if (!r.revealed && r.wrong === 0) first++;
+          if (r.revealed || r.wrong > 0) tricky.push({
+            it,
+            r
+          });
+        });
+        const pct = Math.round(pts / n * 100);
+        const grade = gradeOf(pct);
+        const col = pct >= 90 ? '#3ddc97' : pct >= 77 ? '#c4c04a' : pct >= 60 ? '#e89a3c' : '#ff5d73';
+        $('#rmode').textContent = titleOf(G.mode, G.style) + (G.style === 'name' ? ' · ' + cap(G.diff) : '') + (G.only ? ' · Practice' : '');
+        const gr = $('#grade');
+        gr.textContent = grade;
+        gr.style.color = col;
+        $('#pct').textContent = pct + '%';
+        $('#msg').textContent = pct >= 93 ? 'Master cartographer! 🧭' : pct >= 80 ? 'Nice navigating! 👏' : pct >= 70 ? 'Getting there — keep going!' : 'Keep exploring, it gets easier! 💪';
+        $('#sTime').textContent = fmt(time);
+        $('#sAvg').textContent = (time / n / 1000).toFixed(1) + 's';
+        $('#sFirst').textContent = `${first}/${n}`;
+        $('#sWrong').textContent = G.wrongs;
+        $('#bar i').style.width = '100%';
+
+        // stats, personal best, trend
+        const s = getStats(G.key, G.style),
+          df = G.style === 'name' ? G.diff : '-';
+        let isBest = false,
+          delta = '',
+          dcls = '';
+        if (!G.only) {
+          const sim = s.runs.filter(r => !r.pr && r.l === G.len && r.df === df);
+          isBest = sim.length ? sim.every(r => pct > r.p || (pct === r.p && time < r.t)) : n >= 5;
+          const last = sim.filter(r => !r.imp).pop();
+          if (last) {
+            const d = pct - last.p;
+            delta = d > 0 ? `▲ ${d}% vs last run` : d < 0 ? `▼ ${-d}% vs last run` : 'Same as last run';
+            dcls = d > 0 ? 'up' : d < 0 ? 'down' : ''
+          }
+        }
+        s.games++;
+        s.playMs = (s.playMs || 0) + time;
+        s.runs.push({
+          d: Date.now(),
+          p: pct,
+          t: Math.round(time),
+          n,
+          l: G.len,
+          df,
+          pr: G.only ? 1 : 0
+        });
+        if (s.runs.length > 300) s.runs.splice(0, s.runs.length - 300);
+        saveStats(G.key, G.style);
+        const dl = $('#delta');
+        dl.textContent = delta;
+        dl.className = dcls;
+        $('#best').classList.toggle('hidden', !isBest);
+
+        const rv = $('#rv');
+        rv.innerHTML = '';
+        tricky.sort((a, b) => (b.r.revealed - a.r.revealed) || (b.r.wrong - a.r.wrong));
+        tricky.forEach(({
+          it,
+          r
+        }) => {
+          const sp = document.createElement('span');
+          sp.textContent = it.rev;
+          if (!r.revealed) sp.className = 'some';
+          rv.appendChild(sp)
+        });
+        $('#review').classList.toggle('hidden', !tricky.length);
+        const pr = $('#practice');
+        pr.classList.toggle('hidden', !tricky.length);
+        pr.onclick = () => startGame(G.key, {
+          only: tricky.map(t => t.it.id),
+          style: G.style,
+          diff: G.diff
+        });
+        show('results');
+        $('#results').scrollTop = 0;
+      }
+      $('#again').onclick = () => startGame(G.key, {
+        style: G.style,
+        diff: G.diff
+      });
+      $('#toMenu').onclick = () => {
+        renderMenu();
+        show('menu')
+      };
+
+      /* ================= INFO / STATS SCREEN ================= */
+      let IS = {
+        key: null,
+        style: 'find'
+      };
+
+      function openInfo(key) {
+        IS.key = key;
+        IS.style = opts.style;
+        renderInfo();
+        show('info');
+        $('#info').scrollTop = 0
+      }
+
+      function spark(vals) {
+        if (vals.length < 2) return '<div class="empty">Play a few rounds and your trend will show up here.</div>';
+        const w = 300,
+          h = 70,
+          p = 8,
+          n = vals.length;
+        const pts = vals.map((v, i) => [p + i * (w - 2 * p) / (n - 1), h - p - (v / 100) * (h - 2 * p)]);
+        return `<svg viewBox="0 0 ${w} ${h}" class="spark" preserveAspectRatio="none"><polyline points="${pts.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}" fill="none" stroke="#4cc9f0" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+  <div class="sparklbl"><span>${vals[0]}%</span><span>${vals[n-1]}% latest</span></div>`;
+      }
+      const row = (name, right, cls) => `<div class="row"><span>${name}</span><span class="rt ${cls||''}">${right}</span></div>`;
+      const sec = (title, inner) => `<div class="sec"><h3>${title}</h3>${inner}</div>`;
+      const stbox = (v, l) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`;
+
+      function weakIds(key, style) {
+        const m = MODES[key],
+          s = getStats(key, style),
+          list = buildItems(m, style);
+        const valid = new Set(list.map(i => i.id));
+        const tr = Object.keys(s.items).filter(id => valid.has(id)).map(id => {
+            const it = s.items[id];
+            return {
+              id,
+              it,
+              sc: (it.w + 2 * it.r) / it.a
+            }
+          })
+          .filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc || b.it.a - a.it.a).map(x => x.id);
+        const unseen = shuffle(list.filter(i => !s.items[i.id]).map(i => i.id));
+        return tr.concat(unseen).slice(0, 10);
+      }
+
+      function renderInfo() {
+        const m = MODES[IS.key],
+          style = IS.style,
+          s = getStats(IS.key, style);
+        document.querySelectorAll('#infoTabs button').forEach(b => b.classList.toggle('on', b.dataset.v === style));
+        $('#infoTitle').textContent = m.icon + ' ' + titleOf(m, style);
+        const list = buildItems(m, style),
+          imap = {};
+        list.forEach(i => imap[i.id] = i);
+        const nm = id => esc(imap[id] ? imap[id].rev : id);
+        const sn = id => esc(imap[id] ? imap[id].sn : id);
+        const N = modeCount(m);
+        const ids = Object.keys(s.items).filter(id => imap[id]);
+        const H = [];
+
+        if (!ids.length) {
+          $('#infoBody').innerHTML = sec('No data yet', '<div class="empty">Play a round of this mode and your stats will appear here: misses per item, your strongest items, mix-ups, speed and more.</div>');
+          return;
+        }
+
+        let A = 0,
+          F = 0,
+          Wr = 0,
+          T = 0,
+          Nn = 0,
+          mastered = 0,
+          learning = 0;
+        ids.forEach(id => {
+          const it = s.items[id];
+          A += it.a;
+          F += it.f;
+          Wr += it.w;
+          T += it.t;
+          Nn += it.n;
+          isMastered(it) ? mastered++ : learning++
+        });
+        H.push(`<div class="stats">${stbox(s.games,'Rounds played')}${stbox(A,'Questions answered')}
+    ${stbox(Math.round(F/A*100)+'%','First-try rate')}${stbox((Nn?T/Nn/1000:0).toFixed(1)+'s','Avg time / answer')}
+    ${stbox(Wr,style==='find'?'Wrong taps':'Wrong answers')}${stbox(fmtLong(s.playMs||0),'Time played')}</div>`);
+
+        // mastery
+        const tot = Math.max(N, mastered + learning),
+          unseen = tot - mastered - learning;
+        H.push(sec('Mastery', `<div class="mbar"><i style="width:${mastered/tot*100}%;background:#2fbf84"></i><i style="width:${learning/tot*100}%;background:#e8b64a"></i></div>
+    <div class="legend"><span>🟢 ${mastered} mastered</span><span>🟡 ${learning} learning</span><span>⚪ ${unseen} not seen</span></div>
+    <div class="n2">Mastered = seen 3+ times and right on the first try at least 80% of the time.</div>`));
+
+        // trend
+        const runs = s.runs.filter(r => !r.pr && !r.imp).slice(-20).map(r => r.p);
+        H.push(sec('Score trend (last 20 rounds)', spark(runs)));
+
+        // best runs
+        const bm = {};
+        s.runs.filter(r => !r.pr).forEach(r => {
+          const k = r.l + '|' + r.df;
+          const b = bm[k];
+          if (!b || r.p > b.p || (r.p === b.p && r.t < b.t)) bm[k] = r
+        });
+        const br = [];
+        ['10', '25', 'all'].forEach(l => ['-', 'easy', 'medium', 'hard'].forEach(d => {
+          const r = bm[l + '|' + d];
+          if (!r) return;
+          br.push(row(`${l==='all'?'All questions':l+' questions'}${d!=='-'?' · '+cap(d):''}`, `${gradeOf(r.p)} · ${r.p}% · ${fmt(r.t)}`, 'good'));
+        }));
+        if (br.length) H.push(sec('Best rounds', `<div class="rows">${br.join('')}</div>`));
+
+        // trouble spots
+        const trouble = ids.map(id => {
+            const it = s.items[id];
+            return {
+              id,
+              it,
+              sc: (it.w + 2 * it.r) / it.a
+            }
+          }).filter(x => x.sc > 0)
+          .sort((a, b) => b.sc - a.sc || b.it.a - a.it.a).slice(0, 8);
+        H.push(sec('⚠️ Trouble spots', trouble.length ?
+          `<div class="rows">${trouble.map(x=>row(nm(x.id),`missed ${x.it.a-x.it.f} of ${x.it.a}${x.it.r?` · shown ${x.it.r}×`:''}`,'bad')).join('')}</div>` :
+          '<div class="empty">Nothing yet. You haven’t missed anything!</div>'));
+
+        // rock solid
+        const solid = ids.filter(id => s.items[id].a >= 2 && s.items[id].f === s.items[id].a)
+          .sort((a, b) => s.items[b].a - s.items[a].a || (s.items[a].t / s.items[a].n) - (s.items[b].t / s.items[b].n)).slice(0, 8);
+        H.push(sec('💪 Rock solid (never missed)', solid.length ?
+          `<div class="rows">${solid.map(id=>row(nm(id),`${s.items[id].a}/${s.items[id].a} first try`,'good')).join('')}</div>` :
+          '<div class="empty">Get an item right first try 2+ times and it shows up here.</div>'));
+
+        // mix-ups
+        const mix = [];
+        ids.forEach(id => {
+          const c = s.items[id].c;
+          for (const k in c) mix.push([id, k, c[k]])
+        });
+        mix.sort((a, b) => b[2] - a[2]);
+        if (mix.length) H.push(sec('🔀 Mix-ups (answer → what you picked)',
+          `<div class="rows">${mix.slice(0,6).map(x=>row(`${sn(x[0])} → ${sn(x[1])}`,`${x[2]}×`,'bad')).join('')}</div>`));
+
+        // speed
+        const timed = ids.filter(id => s.items[id].n >= 2).map(id => ({
+          id,
+          avg: s.items[id].t / s.items[id].n
+        }));
+        if (timed.length >= 4) {
+          const slow = timed.slice().sort((a, b) => b.avg - a.avg).slice(0, 5),
+            fast = timed.slice().sort((a, b) => a.avg - b.avg).slice(0, 5);
+          H.push(sec('🐢 Slowest to find', `<div class="rows">${slow.map(x=>row(nm(x.id),(x.avg/1000).toFixed(1)+'s avg')).join('')}</div>`));
+          H.push(sec('⚡ Fastest', `<div class="rows">${fast.map(x=>row(nm(x.id),(x.avg/1000).toFixed(1)+'s avg','good')).join('')}</div>`));
+        }
+
+        // everything
+        const all = list.slice().sort((a, b) => a.rev.localeCompare(b.rev)).map(i => {
+          const it = s.items[i.id];
+          if (!it) return row(esc(i.rev), 'not seen', 'dim');
+          const miss = it.a - it.f;
+          return row(esc(i.rev), `${miss} missed / ${it.a}`, miss === 0 ? 'good' : miss / it.a > .4 ? 'bad' : '');
+        }).join('');
+        H.push(`<div class="sec"><details><summary>All ${list.length} items · times missed</summary><div class="rows">${all}</div></details></div>`);
+
+        H.push(`<div class="acts"><button class="btn primary" data-act="practice">🎯 Practice my weakest 10</button>
+    <button class="btn danger" data-act="reset">Reset stats for this mode</button></div>`);
+        $('#infoBody').innerHTML = H.join('');
+      }
+      $('#infoTabs').addEventListener('click', e => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        IS.style = b.dataset.v;
+        renderInfo()
+      });
+      $('#infoBack').onclick = () => {
+        renderMenu();
+        show('menu')
+      };
+      $('#infoBody').addEventListener('click', e => {
+        const b = e.target.closest('[data-act]');
+        if (!b) return;
+        if (b.dataset.act === 'practice') {
+          const ids = weakIds(IS.key, IS.style);
+          if (ids.length) startGame(IS.key, {
+            only: ids,
+            style: IS.style
+          });
+        } else if (b.dataset.act === 'reset') {
+          if (confirm('Erase all stats for ' + titleOf(MODES[IS.key], IS.style) + ' (' + (IS.style === 'find' ? 'Find it' : 'Name it') + ')?')) {
+            delete STC[stKey(IS.key, IS.style)];
+            store.del(stKey(IS.key, IS.style));
+            renderInfo();
+          }
+        }
+      });
+
+      /* ================= RESIZE / KEYBOARD ================= */
+      function fitVV() {
+        const vv = window.visualViewport,
+          g = $('#game');
+        if (!vv) return;
+        if (Math.abs(vv.height - window.innerHeight) > 2 || vv.offsetTop > 1) {
+          g.style.height = vv.height + 'px';
+          g.style.top = vv.offsetTop + 'px';
+          g.style.bottom = 'auto';
+        } else {
+          g.style.height = '';
+          g.style.top = '';
+          g.style.bottom = ''
+        }
+        window.scrollTo(0, 0);
+      }
+      if (window.visualViewport) {
+        visualViewport.addEventListener('resize', fitVV);
+        visualViewport.addEventListener('scroll', fitVV)
+      }
+
+      let rt = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(rt);
+        rt = setTimeout(() => {
+          // Name mode just rescales via the SVG viewBox (so the keyboard doesn't reset the map)
+          if (!G || G.done || G.style !== 'find' || $('#game').classList.contains('hidden')) return;
+          const w = $('#mapwrap').clientWidth,
+            h = $('#mapwrap').clientHeight;
+          if (Math.abs(w - M.W) > 30 || Math.abs(h - M.H) > M.H * .25) renderMap();
+        }, 250);
+      });
+
+      renderMenu();
+      show('menu');
+    })();
+
+  </script>
+</body>
+
+</html>
