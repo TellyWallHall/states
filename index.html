@@ -362,7 +362,7 @@
       pointer-events: none
     }
 
-    .a-btn:disabled:not(.right):not(.wrong) {
+    .a-btn:disabled:not(.right):not(.wrong):not(.ok1):not(.ok2):not(.ok3):not(.miss) {
       opacity: .45
     }
 
@@ -378,6 +378,34 @@
       border-color: #2fbf84;
       color: #7dffc8;
       opacity: 1
+    }
+
+    .a-btn.ok1 {
+      background: #2fbf8433;
+      border-color: #2fbf84;
+      color: #7dffc8;
+      opacity: .8
+    }
+
+    .a-btn.ok2 {
+      background: #c4c04a33;
+      border-color: #c4c04a;
+      color: #f7f394;
+      opacity: .8
+    }
+
+    .a-btn.ok3 {
+      background: #e89a3c33;
+      border-color: #e89a3c;
+      color: #ffc27a;
+      opacity: .8
+    }
+
+    .a-btn.miss {
+      background: #e0566b33;
+      border-color: #e0566b;
+      color: #ff9aa9;
+      opacity: .8
     }
 
     .a-med {
@@ -502,6 +530,10 @@
       fill: #18223a
     }
 
+    .shape.done, .dot.done {
+      pointer-events: none;
+    }
+
     .shape.ok1 {
       fill: #2fbf84
     }
@@ -549,6 +581,10 @@
       fill: #f4f7ff;
       stroke: #0a1020;
       pointer-events: none
+    }
+
+    .dot.done {
+      pointer-events: none;
     }
 
     .dot.ok1 {
@@ -1862,8 +1898,6 @@
             .each(function(d) {
               M.dots[d[0]] = this
             });
-          if (G.style === 'name')
-            for (const k in M.dots) M.dots[k].style.display = 'none';
         }
         M.ring = g.append('circle').attr('class', 'ring').style('display', 'none');
         M.lbl = g.append('text').attr('class', 'lbl').style('display', 'none');
@@ -1906,6 +1940,7 @@
         el.classList.remove('ok1', 'ok2', 'ok3', 'miss');
         if (!r) return;
         el.classList.add(r.revealed ? 'miss' : r.wrong === 0 ? 'ok1' : r.wrong === 1 ? 'ok2' : 'ok3');
+        el.classList.add('done'); // disables further clicking/tapping once completed successfully or revealed
       }
 
       function center(id) {
@@ -2033,6 +2068,7 @@
             t = M.t;
           let bd = 28;
           for (const k in M.pos) {
+            if (G.res[k]) continue; // skip already completed dots
             const d = Math.hypot(M.pos[k][0] * t.k + t.x - x, M.pos[k][1] * t.k + t.y - y);
             if (d < bd) {
               bd = d;
@@ -2041,7 +2077,9 @@
           }
         } else {
           const el = document.elementFromPoint(e.clientX, e.clientY);
-          if (el && el.classList && el.classList.contains('tgt')) id = el.getAttribute('data-id');
+          if (el && el.classList && el.classList.contains('tgt') && !el.classList.contains('done')) {
+            id = el.getAttribute('data-id');
+          }
         }
         if (id) guess(id);
       }
@@ -2122,8 +2160,10 @@
         } else if (G.diff === 'medium') {
           for (const id in G.btns) {
             const b = G.btns[id];
-            b.className = 'a-btn';
-            b.disabled = false
+            if (!G.res[id]) {
+              b.className = 'a-btn';
+              b.disabled = false;
+            }
           }
         } else {
           G.input.value = '';
@@ -2219,7 +2259,6 @@
       function presentTarget() { // Name mode: highlight the thing to identify
         const id = G.cur.id;
         if (isDot(G.mode)) {
-          for (const k in M.dots) M.dots[k].style.display = (k === id) ? '' : 'none';
           highlight(id, {
             ring: true,
             label: false
@@ -2242,10 +2281,6 @@
 
       function advance() {
         if (!G || G.done) return;
-        if (G.cur && G.style === 'name') {
-          const el = elOf(G.cur.id);
-          el && el.classList.remove('ok1', 'ok2', 'ok3', 'miss')
-        }
         G.idx++;
         if (G.idx >= G.items.length) return finish();
         G.cur = Object.assign({
@@ -2285,8 +2320,14 @@
           clearPulse();
           if (name) M.ring.style('display', 'none');
           paint(cur.id);
+          if (name && G.diff === 'medium' && G.btns[cur.id]) {
+            const b = G.btns[cur.id];
+            b.disabled = true;
+            b.classList.remove('ok1', 'ok2', 'ok3', 'miss');
+            b.classList.add(cur.wrong === 0 ? 'ok1' : cur.wrong === 1 ? 'ok2' : 'ok3');
+          }
           showLabel(cur.id, cur.label, name ? 1100 : 1000);
-          if (name && G.btns[cur.id]) G.btns[cur.id].classList.add('right');
+          if (name && G.btns[cur.id] && G.diff !== 'medium') G.btns[cur.id].classList.add('right');
           setFb(name ? `✓ ${cur.show}` : (cur.wrong === 0 ? '✓ Correct!' : '✓ Got it'), 'good');
           G.locked = true;
           setTimeout(() => {
@@ -2299,7 +2340,6 @@
           if (id) noteConf(cur.id, id);
           if (!name) {
             flash(id);
-            // intentional: shows what you actually tapped (state name in the Capital → State mode)
             setFb(`✗ That's ${findName(id)}`, 'bad');
           } else {
             if (id && G.btns[id]) {
@@ -2338,8 +2378,11 @@
           showLabel(cur.id, cur.label, 0);
           for (const id in G.btns) {
             const b = G.btns[id];
-            b.disabled = true;
-            if (id === cur.id) b.classList.add('right')
+            if (id === cur.id) {
+              b.disabled = true;
+              b.classList.remove('ok1', 'ok2', 'ok3', 'miss');
+              b.classList.add(G.diff === 'medium' ? 'miss' : 'right');
+            }
           }
           setFb(`It's ${cur.show} — remember this one!`, 'info');
         }
@@ -2701,7 +2744,6 @@
       window.addEventListener('resize', () => {
         clearTimeout(rt);
         rt = setTimeout(() => {
-          // Name mode just rescales via the SVG viewBox (so the keyboard doesn't reset the map)
           if (!G || G.done || G.style !== 'find' || $('#game').classList.contains('hidden')) return;
           const w = $('#mapwrap').clientWidth,
             h = $('#mapwrap').clientHeight;
